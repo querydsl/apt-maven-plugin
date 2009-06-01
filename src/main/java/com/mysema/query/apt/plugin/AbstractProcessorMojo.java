@@ -134,11 +134,14 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                     new File(project.getBasedir(), "target/apt-log").getAbsolutePath(), 
                     writer.toString());
 
-            if (isForTest()){
-                project.addTestCompileSourceRoot(outputDirectory.getAbsolutePath());                
-            }else{
-                project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
+            if (outputDirectory != null){
+                if (isForTest()){
+                    project.addTestCompileSourceRoot(outputDirectory.getAbsolutePath());                
+                }else{
+                    project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
+                }    
             }
+            
             
         } catch (Exception e1) {
             super.getLog().error("execute error", e1);
