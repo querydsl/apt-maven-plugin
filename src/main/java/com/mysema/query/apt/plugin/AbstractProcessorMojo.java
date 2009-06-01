@@ -1,8 +1,7 @@
 package com.mysema.query.apt.plugin;
 
 import java.io.File;
-import java.io.StringWriter;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -124,15 +123,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 options.add(outputDirectory.getPath());    
             }            
             
-            Writer writer = new StringWriter();
             CompilationTask task = compiler.getTask(
-                    writer, fileManager, null, options,
+                    new PrintWriter(System.out), fileManager, null, options,
                     null, compilationUnits1);
             // Perform the compilation task.
             task.call();
-            FileUtils.fileWrite(
-                    new File(project.getBasedir(), "target/apt-log").getAbsolutePath(), 
-                    writer.toString());
 
             if (outputDirectory != null){
                 if (isForTest()){
