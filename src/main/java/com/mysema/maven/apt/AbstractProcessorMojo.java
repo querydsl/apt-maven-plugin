@@ -1,4 +1,9 @@
-package com.mysema.query.apt.plugin;
+/*
+ * Copyright (c) 2009 Mysema Ltd.
+ * All rights reserved.
+ * 
+ */
+package com.mysema.maven.apt;
 
 import java.io.File;
 import java.io.StringWriter;
