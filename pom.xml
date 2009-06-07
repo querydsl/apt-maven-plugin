@@ -11,7 +11,7 @@
   <groupId>com.mysema.maven</groupId>
   <artifactId>maven-apt-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <name>Maven - APT plugin</name>
   
   <properties>
@@ -41,6 +41,5 @@
       <version>1.5.9</version>
     </dependency>
   </dependencies>
-
 
 </project>
