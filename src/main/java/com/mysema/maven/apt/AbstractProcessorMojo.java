@@ -50,6 +50,13 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter
      */
     protected String processor;
+    
+    
+    /**
+     * @parameter expression="${project.build.sourceEncoding}" required=tue
+     */
+    protected String sourceEncoding;
+    
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -121,6 +128,10 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             options.add("-cp");
             options.add(compileClassPath);
+            if (sourceEncoding != null){
+                options.add("-encoding");
+                options.add(sourceEncoding);    
+            }            
             options.add("-proc:only");
             options.add("-processor");
             options.add(processor);
