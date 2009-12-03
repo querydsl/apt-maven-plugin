@@ -86,11 +86,12 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     private String buildProcessor() {
         if (processors != null){
             StringBuilder result = new StringBuilder();
-            int i = 0;
-            for (i = 0; i < processors.length - 1; ++i) {
-                result.append(processors[i]).append(',');
+            for (String processor : processors){
+                if (result.length() > 0){
+                    result.append(",");
+                }                    
+                result.append(processor);
             }
-            result.append(processors[i]);
             return result.toString();    
         }else if (processor != null){
             return processor;
