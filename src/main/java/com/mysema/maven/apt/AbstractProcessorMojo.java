@@ -10,6 +10,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -57,6 +58,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      */
     protected String sourceEncoding;
     
+    /**
+     * @parameter
+     */
+    protected Map<String,String> options;
+    
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -103,15 +109,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     }
 
     @SuppressWarnings("unchecked")
-    public void execute() throws MojoExecutionException {
-//        if (outputDirectory == null){
-//            String buildDir = project.getBuild().getDirectory();
-//            if (isForTest()){
-//                outputDirectory = new File(buildDir, "generated-test-sources/java");
-//            }else{
-//                outputDirectory = new File(buildDir, "generated-sources/java");
-//            }
-//        }                        
+    public void execute() throws MojoExecutionException {                    
         if (outputDirectory != null && !outputDirectory.exists()) {
             outputDirectory.mkdirs();
         }        
@@ -125,25 +123,34 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             String processor = buildProcessor();
 
-            List<String> options = new ArrayList<String>(10);
+            List<String> opts = new ArrayList<String>(10);
 
-            options.add("-cp");
-            options.add(compileClassPath);
+            opts.add("-cp");
+            opts.add(compileClassPath);
+            
             if (sourceEncoding != null){
-                options.add("-encoding");
-                options.add(sourceEncoding);    
+                opts.add("-encoding");
+                opts.add(sourceEncoding);    
             }            
-            options.add("-proc:only");
-            options.add("-processor");
-            options.add(processor);
+            
+            opts.add("-proc:only");
+            opts.add("-processor");
+            opts.add(processor);
+            
+            if (options != null){
+                for (Map.Entry<String,String> entry : options.entrySet()){
+                    opts.add("-A"+entry.getKey()+"="+entry.getValue());
+                }
+            }
+            
             if (outputDirectory != null){
-                options.add("-s");
-                options.add(outputDirectory.getPath());    
+                opts.add("-s");
+                opts.add(outputDirectory.getPath());    
             }            
             
             Writer writer = new StringWriter();
             CompilationTask task = compiler.getTask(
-                    writer, fileManager, null, options,
+                    writer, fileManager, null, opts,
                     null, compilationUnits1);
             // Perform the compilation task.
             task.call();
