@@ -11,7 +11,7 @@
   <groupId>com.mysema.maven</groupId>
   <artifactId>maven-apt-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>0.3.2</version>
+  <version>0.3.2-SNAPSHOT</version>
   <name>Maven - APT plugin</name>
   
   <properties>
