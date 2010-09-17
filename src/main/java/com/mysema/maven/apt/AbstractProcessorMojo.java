@@ -6,9 +6,8 @@
 package com.mysema.maven.apt;
 
 import java.io.File;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +22,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Base class for AnnotationProcessorMojo implementations
@@ -63,6 +63,15 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      */
     protected Map<String,String> options;
     
+    /**
+     * @parameter
+     */
+    protected Map<String,String> compilerOptions;
+
+    /**
+     * @parameter
+     */
+    protected boolean showWarnings = false;
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -123,40 +132,54 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             String processor = buildProcessor();
 
-            List<String> opts = new ArrayList<String>(10);
+            Map<String, String> compilerOpts = new LinkedHashMap<String, String>();
 
-            opts.add("-cp");
-            opts.add(compileClassPath);
+            // Default options
+            compilerOpts.put("cp", compileClassPath);
             
             if (sourceEncoding != null){
-                opts.add("-encoding");
-                opts.add(sourceEncoding);    
-            }            
+                compilerOpts.put("encoding", sourceEncoding);    
+            }
             
-            opts.add("-proc:only");
-            opts.add("-processor");
-            opts.add(processor);
+            compilerOpts.put("proc:only", null);
+            compilerOpts.put("processor", processor);
             
             if (options != null){
                 for (Map.Entry<String,String> entry : options.entrySet()){
-                    opts.add("-A"+entry.getKey()+"="+entry.getValue());
+                    compilerOpts.put("A"+entry.getKey()+"="+entry.getValue(), null);
                 }
             }
             
             if (outputDirectory != null){
-                opts.add("-s");
-                opts.add(outputDirectory.getPath());    
-            }            
+                compilerOpts.put("s", outputDirectory.getPath());    
+            }
             
-            Writer writer = new StringWriter();
+            if (!showWarnings) {
+                compilerOpts.put("nowarn", null);
+            }
+            
+            compilerOpts.put("sourcepath", getSourceDirectory().getCanonicalPath());
+            
+            // User options override default options
+            if (compilerOptions != null) {
+                compilerOpts.putAll(compilerOptions);
+            }
+
+            List<String> opts = new ArrayList<String>(compilerOpts.size() * 2);
+            
+            for (Map.Entry<String, String> compilerOption : compilerOpts.entrySet()) {
+                opts.add("-" + compilerOption.getKey());
+                String value = compilerOption.getValue();
+                if (StringUtils.isNotBlank(value)) {
+                    opts.add(value);
+                }
+            }
+            
             CompilationTask task = compiler.getTask(
-                    writer, fileManager, null, opts,
+                    null, fileManager, null, opts,
                     null, compilationUnits1);
             // Perform the compilation task.
             task.call();
-            FileUtils.fileWrite(
-                    new File(project.getBasedir(), "target/apt-log").getAbsolutePath(), 
-                    writer.toString());
 
             if (outputDirectory != null){
                 if (isForTest()){
