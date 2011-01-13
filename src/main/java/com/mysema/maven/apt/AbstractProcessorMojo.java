@@ -6,6 +6,8 @@
 package com.mysema.maven.apt;
 
 import java.io.File;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,6 +75,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      */
     protected boolean showWarnings = false;
 
+    /**
+     * @parameter
+     */
+    protected boolean logOnlyOnError = false;
+    
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
         List<String> pathElements = null;
@@ -175,11 +182,18 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 }
             }
             
+            Writer out = null;
+            if (logOnlyOnError){
+                out = new StringWriter();
+            }            
             CompilationTask task = compiler.getTask(
-                    null, fileManager, null, opts,
+                    out, fileManager, null, opts,
                     null, compilationUnits1);
             // Perform the compilation task.
-            task.call();
+            Boolean rv = task.call();
+            if (rv.equals(Boolean.FALSE) && logOnlyOnError){
+                getLog().error(out.toString());
+            }
 
             if (outputDirectory != null){
                 if (isForTest()){
