@@ -16,12 +16,11 @@ import java.io.File;
  */
 public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
 
-  /**
-   * @parameter expression="${project.build.testSourceDirectory}" required=true
-   */
-  protected File sourceDirectory;
-    
-
+    /**
+     * @parameter expression="${project.build.testSourceDirectory}" required=true
+     */
+    protected File sourceDirectory;
+  
     @Override
     protected File getSourceDirectory() {
         return sourceDirectory;
