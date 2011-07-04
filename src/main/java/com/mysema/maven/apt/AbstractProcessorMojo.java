@@ -19,6 +19,7 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -79,6 +80,12 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter
      */
     protected boolean logOnlyOnError = false;
+
+    /**
+     * @parameter expression="${plugin.artifacts}" readonly=true required=true
+     */
+    private List<Artifact> pluginArtifacts;
+
     
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -93,14 +100,24 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             super.getLog().warn("exception calling getCompileClasspathElements", e);
             return null;
         }
+        
+        if (pluginArtifacts != null) {
+            for (Artifact a : pluginArtifacts) {
+                if (a.getFile() != null) {
+                    pathElements.add(a.getFile().getAbsolutePath());
+                }
+            }
+        }     
+        
         if (pathElements.isEmpty()){
             return null;   
-        }
+        }        
+        
         StringBuilder result = new StringBuilder();
         int i = 0;
         for (i = 0; i < pathElements.size() - 1; ++i) {
             result.append(pathElements.get(i)).append(File.pathSeparatorChar);
-        }
+        }        
         result.append(pathElements.get(i));
         return result.toString();
     }
@@ -136,7 +153,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
 
             String compileClassPath = buildCompileClasspath();
-
+                        
             String processor = buildProcessor();
 
             Map<String, String> compilerOpts = new LinkedHashMap<String, String>();
