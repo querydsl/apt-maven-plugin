@@ -41,11 +41,6 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     protected MavenProject project;
 
     /**
-     * @parameter 
-     */
-    protected File outputDirectory;
-
-    /**
      * @parameter
      */
     protected String[] processors;
@@ -143,8 +138,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
     @SuppressWarnings("unchecked")
     public void execute() throws MojoExecutionException {                    
-        if (outputDirectory != null && !outputDirectory.exists()) {
-            outputDirectory.mkdirs();
+        if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
+            getOutputDirectory().mkdirs();
         }        
         try {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -174,8 +169,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 }
             }
             
-            if (outputDirectory != null){
-                compilerOpts.put("s", outputDirectory.getPath());    
+            if (getOutputDirectory() != null){
+                compilerOpts.put("s", getOutputDirectory().getPath());
             }
             
             if (!showWarnings) {
@@ -212,11 +207,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 getLog().error(out.toString());
             }
 
-            if (outputDirectory != null){
+            if (getOutputDirectory() != null){
                 if (isForTest()){
-                    project.addTestCompileSourceRoot(outputDirectory.getAbsolutePath());                
+                    project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
                 }else{
-                    project.addCompileSourceRoot(outputDirectory.getAbsolutePath());
+                    project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
                 }    
             }
             
@@ -229,6 +224,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     }
 
     protected abstract File getSourceDirectory();
+
+    protected abstract File getOutputDirectory();
 
     protected boolean isForTest(){
         return false;
