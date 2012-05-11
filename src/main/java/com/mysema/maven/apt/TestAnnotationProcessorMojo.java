@@ -11,7 +11,7 @@ import java.io.File;
  * TestAnnotationProcessorMojo calls APT processors for code generation
  * 
  * @goal test-process
- * @phase generate-sources
+ * @phase generate-test-sources
  * @requiresDependencyResolution test
  */
 public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
