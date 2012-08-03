@@ -5,6 +5,7 @@
       <pluginExecutionFilter>
         <goals>
           <goal>process</goal>
+          <goal>test-process</goal>
         </goals>
       </pluginExecutionFilter>
       <action>
