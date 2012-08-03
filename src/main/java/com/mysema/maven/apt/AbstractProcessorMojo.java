@@ -9,9 +9,11 @@ import java.io.File;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
@@ -24,8 +26,9 @@ import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.Scanner;
 import org.codehaus.plexus.util.StringUtils;
+import org.sonatype.plexus.build.incremental.BuildContext;
 
 /**
  * Base class for AnnotationProcessorMojo implementations
@@ -34,6 +37,14 @@ import org.codehaus.plexus.util.StringUtils;
  *
  */
 public abstract class AbstractProcessorMojo extends AbstractMojo {
+	
+	private static final String JAVA_FILE_FILTER = "/*.java";
+	private static final String[] ALL_JAVA_FILES_FILTER = new String[]{"**"+JAVA_FILE_FILTER};
+
+	/**
+	 * @component
+	 */
+	protected BuildContext buildContext;
 
     /**
      * @parameter expression="${project}" readonly=true required=true
@@ -52,7 +63,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     
     
     /**
-     * @parameter expression="${project.build.sourceEncoding}" required=tue
+     * @parameter expression="${project.build.sourceEncoding}" required=true
      */
     protected String sourceEncoding;
     
@@ -65,6 +76,22 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter
      */
     protected Map<String,String> compilerOptions;
+    
+	/**
+	 * A list of inclusion package filters for the apt processor.
+	 * 
+	 * If not specified all sources will be used for apt processor
+	 * 
+	 * <pre>
+	 * e.g.:
+	 * &lt;includes&gt;
+	 * 	&lt;include&gt;com.mypackge.**.bo.**&lt;/include&gt;
+	 * &lt;/includes&gt;
+	 * </pre>
+	 * will include all files which match com/mypackge/ ** /bo/ ** / *.java
+	 * @parameter
+	 */
+    protected Set<String> includes = new HashSet<String>();
 
     /**
      * @parameter
@@ -136,15 +163,46 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public void execute() throws MojoExecutionException {                    
         if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
             getOutputDirectory().mkdirs();
         }        
+
+        getLog().debug("Using build context: "+buildContext);
+        
         try {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                throw new MojoExecutionException("You need to run build with JDK or have tools.jar on the classpath. If this occures during eclipse build make sure you run eclipse under JDK as well");
+            }
+            
+            // support for incremental build in m2e context
+            Scanner scanner = buildContext.newScanner(getSourceDirectory());
+            scanner.setIncludes(ALL_JAVA_FILES_FILTER);
+            
+            // include based on the filter if specified
+            if (includes != null && includes.isEmpty() == false) {
+            	String[] filters = includes.toArray(new String[includes.size()]);
+            	for (int i = 0; i < filters.length; i++) {
+            		filters[i] = filters[i].replace('.', '/') + JAVA_FILE_FILTER;
+				}
+            	scanner.setIncludes(filters);
+            }
+            scanner.scan();
+            
+            String[] includedFiles = scanner.getIncludedFiles();
+            if (includedFiles == null || includedFiles.length == 0) {
+            	// return as there is no relevant sources to generate classes from
+            	getLog().debug("There is no sources to generatate querydsl classes from (skipping)");
+            	return;
+            }
+           
+            Set<File> files = new HashSet<File>();
+            for (String includedFile: includedFiles) {
+            	files.add(new File(scanner.getBasedir(), includedFile));
+			}
+            
             StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-            List<File> files = FileUtils.getFiles(getSourceDirectory(), "**/*.java", null);
             Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
 
             String compileClassPath = buildCompileClasspath();
@@ -212,7 +270,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                     project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
                 }else{
                     project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
-                }    
+                }
+                buildContext.refresh(getOutputDirectory());
             }
             
             
