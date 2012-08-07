@@ -40,277 +40,278 @@ import org.sonatype.plexus.build.incremental.BuildContext;
  */
 public abstract class AbstractProcessorMojo extends AbstractMojo {
 
-	private static final String JAVA_FILE_FILTER = "/*.java";
-	private static final String[] ALL_JAVA_FILES_FILTER = new String[] { "**" + JAVA_FILE_FILTER };
+    private static final String JAVA_FILE_FILTER = "/*.java";
+    private static final String[] ALL_JAVA_FILES_FILTER = new String[] { "**" + JAVA_FILE_FILTER };
 
-	/**
-	 * @component
-	 */
-	protected BuildContext buildContext;
+    /**
+     * @component
+     */
+    protected BuildContext buildContext;
 
-	/**
-	 * @parameter expression="${project}" readonly=true required=true
-	 */
-	protected MavenProject project;
+    /**
+     * @parameter expression="${project}" readonly=true required=true
+     */
+    protected MavenProject project;
 
-	/**
-	 * @parameter
-	 */
-	protected String[] processors;
+    /**
+     * @parameter
+     */
+    protected String[] processors;
 
-	/**
-	 * @parameter
-	 */
-	protected String processor;
+    /**
+     * @parameter
+     */
+    protected String processor;
 
-	/**
-	 * @parameter expression="${project.build.sourceEncoding}" required=true
-	 */
-	protected String sourceEncoding;
+    /**
+     * @parameter expression="${project.build.sourceEncoding}" required=true
+     */
+    protected String sourceEncoding;
 
-	/**
-	 * @parameter
-	 */
-	protected Map<String, String> options;
+    /**
+     * @parameter
+     */
+    protected Map<String, String> options;
 
-	/**
-	 * @parameter
-	 */
-	protected Map<String, String> compilerOptions;
+    /**
+     * @parameter
+     */
+    protected Map<String, String> compilerOptions;
 
-	/**
-	 * A list of inclusion package filters for the apt processor.
-	 * 
-	 * If not specified all sources will be used for apt processor
-	 * 
-	 * <pre>
-	 * e.g.:
-	 * &lt;includes&gt;
-	 * 	&lt;include&gt;com.mypackge.**.bo.**&lt;/include&gt;
-	 * &lt;/includes&gt;
-	 * </pre>
-	 * 
-	 * will include all files which match com/mypackge/ ** /bo/ ** / *.java
-	 * 
-	 * @parameter
-	 */
-	protected Set<String> includes = new HashSet<String>();
+    /**
+     * A list of inclusion package filters for the apt processor.
+     * 
+     * If not specified all sources will be used for apt processor
+     * 
+     * <pre>
+     * e.g.:
+     * &lt;includes&gt;
+     * 	&lt;include&gt;com.mypackge.**.bo.**&lt;/include&gt;
+     * &lt;/includes&gt;
+     * </pre>
+     * 
+     * will include all files which match com/mypackge/ ** /bo/ ** / *.java
+     * 
+     * @parameter
+     */
+    protected Set<String> includes = new HashSet<String>();
 
-	/**
-	 * @parameter
-	 */
-	protected boolean showWarnings = false;
+    /**
+     * @parameter
+     */
+    protected boolean showWarnings = false;
 
-	/**
-	 * @parameter
-	 */
-	protected boolean logOnlyOnError = false;
+    /**
+     * @parameter
+     */
+    protected boolean logOnlyOnError = false;
 
-	/**
-	 * @parameter expression="${plugin.artifacts}" readonly=true required=true
-	 */
-	private List<Artifact> pluginArtifacts;
+    /**
+     * @parameter expression="${plugin.artifacts}" readonly=true required=true
+     */
+    private List<Artifact> pluginArtifacts;
 
-	@SuppressWarnings("unchecked")
-	private String buildCompileClasspath() {
-		List<String> pathElements = null;
-		try {
-			if (isForTest()) {
-				pathElements = project.getTestClasspathElements();
-			} else {
-				pathElements = project.getCompileClasspathElements();
-			}
-		} catch (DependencyResolutionRequiredException e) {
-			super.getLog().warn("exception calling getCompileClasspathElements", e);
-			return null;
-		}
+    @SuppressWarnings("unchecked")
+    private String buildCompileClasspath() {
+        List<String> pathElements = null;
+        try {
+            if (isForTest()) {
+                pathElements = project.getTestClasspathElements();
+            } else {
+                pathElements = project.getCompileClasspathElements();
+            }
+        } catch (DependencyResolutionRequiredException e) {
+            super.getLog().warn("exception calling getCompileClasspathElements", e);
+            return null;
+        }
 
-		if (pluginArtifacts != null) {
-			for (Artifact a : pluginArtifacts) {
-				if (a.getFile() != null) {
-					pathElements.add(a.getFile().getAbsolutePath());
-				}
-			}
-		}
+        if (pluginArtifacts != null) {
+            for (Artifact a : pluginArtifacts) {
+                if (a.getFile() != null) {
+                    pathElements.add(a.getFile().getAbsolutePath());
+                }
+            }
+        }
 
-		if (pathElements.isEmpty()) {
-			return null;
-		}
+        if (pathElements.isEmpty()) {
+            return null;
+        }
 
-		StringBuilder result = new StringBuilder();
-		int i = 0;
-		for (i = 0; i < pathElements.size() - 1; ++i) {
-			result.append(pathElements.get(i)).append(File.pathSeparatorChar);
-		}
-		result.append(pathElements.get(i));
-		return result.toString();
-	}
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        for (i = 0; i < pathElements.size() - 1; ++i) {
+            result.append(pathElements.get(i)).append(File.pathSeparatorChar);
+        }
+        result.append(pathElements.get(i));
+        return result.toString();
+    }
 
-	private String buildProcessor() {
-		if (processors != null) {
-			StringBuilder result = new StringBuilder();
-			for (String processor : processors) {
-				if (result.length() > 0) {
-					result.append(",");
-				}
-				result.append(processor);
-			}
-			return result.toString();
-		} else if (processor != null) {
-			return processor;
-		} else {
-			String error = "Either processor or processors need to be given";
-			getLog().error(error);
-			throw new IllegalArgumentException(error);
-		}
-	}
+    private String buildProcessor() {
+        if (processors != null) {
+            StringBuilder result = new StringBuilder();
+            for (String processor : processors) {
+                if (result.length() > 0) {
+                    result.append(",");
+                }
+                result.append(processor);
+            }
+            return result.toString();
+        } else if (processor != null) {
+            return processor;
+        } else {
+            String error = "Either processor or processors need to be given";
+            getLog().error(error);
+            throw new IllegalArgumentException(error);
+        }
+    }
 
-	private List<String> buildCompilerOptions(String processor, String compileClassPath) throws IOException {
-		Map<String, String> compilerOpts = new LinkedHashMap<String, String>();
+    private List<String> buildCompilerOptions(String processor, String compileClassPath) throws IOException {
+        Map<String, String> compilerOpts = new LinkedHashMap<String, String>();
 
-		// Default options
-		compilerOpts.put("cp", compileClassPath);
+        // Default options
+        compilerOpts.put("cp", compileClassPath);
 
-		if (sourceEncoding != null) {
-			compilerOpts.put("encoding", sourceEncoding);
-		}
+        if (sourceEncoding != null) {
+            compilerOpts.put("encoding", sourceEncoding);
+        }
 
-		compilerOpts.put("proc:only", null);
-		compilerOpts.put("processor", processor);
+        compilerOpts.put("proc:only", null);
+        compilerOpts.put("processor", processor);
 
-		if (options != null) {
-			for (Map.Entry<String, String> entry : options.entrySet()) {
-				compilerOpts.put("A" + entry.getKey() + "=" + entry.getValue(), null);
-			}
-		}
+        if (options != null) {
+            for (Map.Entry<String, String> entry : options.entrySet()) {
+                compilerOpts.put("A" + entry.getKey() + "=" + entry.getValue(), null);
+            }
+        }
 
-		if (getOutputDirectory() != null) {
-			compilerOpts.put("s", getOutputDirectory().getPath());
-		}
+        if (getOutputDirectory() != null) {
+            compilerOpts.put("s", getOutputDirectory().getPath());
+        }
 
-		if (!showWarnings) {
-			compilerOpts.put("nowarn", null);
-		}
+        if (!showWarnings) {
+            compilerOpts.put("nowarn", null);
+        }
 
-		compilerOpts.put("sourcepath", getSourceDirectory().getCanonicalPath());
+        compilerOpts.put("sourcepath", getSourceDirectory().getCanonicalPath());
 
-		// User options override default options
-		if (compilerOptions != null) {
-			compilerOpts.putAll(compilerOptions);
-		}
+        // User options override default options
+        if (compilerOptions != null) {
+            compilerOpts.putAll(compilerOptions);
+        }
 
-		List<String> opts = new ArrayList<String>(compilerOpts.size() * 2);
+        List<String> opts = new ArrayList<String>(compilerOpts.size() * 2);
 
-		for (Map.Entry<String, String> compilerOption : compilerOpts.entrySet()) {
-			opts.add("-" + compilerOption.getKey());
-			String value = compilerOption.getValue();
-			if (StringUtils.isNotBlank(value)) {
-				opts.add(value);
-			}
-		}
-		return opts;
-	}
-	
-	/**
-	 * Filter files for apt processing based on the {@link #includes} filter and
-	 * also taking into account m2e {@link BuildContext} to filter-out unchanged
-	 * files when invoked as incremental build
-	 * 
-	 * @param directory source directory in which files are located for apt processing 
-	 * 
-	 * @return files for apt processing. Returns empty set when there is no
-	 *         files to process
-	 */
-	private Set<File> filterFiles(File directory) {
-		// support for incremental build in m2e context
-		Scanner scanner = buildContext.newScanner(getSourceDirectory());
-		scanner.setIncludes(ALL_JAVA_FILES_FILTER);
+        for (Map.Entry<String, String> compilerOption : compilerOpts.entrySet()) {
+            opts.add("-" + compilerOption.getKey());
+            String value = compilerOption.getValue();
+            if (StringUtils.isNotBlank(value)) {
+                opts.add(value);
+            }
+        }
+        return opts;
+    }
 
-		// include based on the filter if specified
-		if (includes != null && includes.isEmpty() == false) {
-			String[] filters = includes.toArray(new String[includes.size()]);
-			for (int i = 0; i < filters.length; i++) {
-				filters[i] = filters[i].replace('.', '/') + JAVA_FILE_FILTER;
-			}
-			scanner.setIncludes(filters);
-		}
-		scanner.scan();
+    /**
+     * Filter files for apt processing based on the {@link #includes} filter and
+     * also taking into account m2e {@link BuildContext} to filter-out unchanged
+     * files when invoked as incremental build
+     * 
+     * @param directory
+     *            source directory in which files are located for apt processing
+     * 
+     * @return files for apt processing. Returns empty set when there is no
+     *         files to process
+     */
+    private Set<File> filterFiles(File directory) {
+        // support for incremental build in m2e context
+        Scanner scanner = buildContext.newScanner(getSourceDirectory());
+        scanner.setIncludes(ALL_JAVA_FILES_FILTER);
 
-		String[] includedFiles = scanner.getIncludedFiles();
-		if (includedFiles == null || includedFiles.length == 0) {
-			// there is no relevant sources to generate classes from
-			return Collections.emptySet();
-		}
+        // include based on the filter if specified
+        if (includes != null && includes.isEmpty() == false) {
+            String[] filters = includes.toArray(new String[includes.size()]);
+            for (int i = 0; i < filters.length; i++) {
+                filters[i] = filters[i].replace('.', '/') + JAVA_FILE_FILTER;
+            }
+            scanner.setIncludes(filters);
+        }
+        scanner.scan();
 
-		Set<File> files = new HashSet<File>();
-		for (String includedFile : includedFiles) {
-			files.add(new File(scanner.getBasedir(), includedFile));
-		}
-		return files;
-	}
+        String[] includedFiles = scanner.getIncludedFiles();
+        if (includedFiles == null || includedFiles.length == 0) {
+            // there is no relevant sources to generate classes from
+            return Collections.emptySet();
+        }
 
-	public void execute() throws MojoExecutionException {
-		if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
-			getOutputDirectory().mkdirs();
-		}
+        Set<File> files = new HashSet<File>();
+        for (String includedFile : includedFiles) {
+            files.add(new File(scanner.getBasedir(), includedFile));
+        }
+        return files;
+    }
 
-		getLog().debug("Using build context: " + buildContext);
-		
-		try {
-			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-			if (compiler == null) {
-				throw new MojoExecutionException("You need to run build with JDK or have tools.jar on the classpath."
-						+ "If this occures during eclipse build make sure you run eclipse under JDK as well");
-			}
+    public void execute() throws MojoExecutionException {
+        if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
+            getOutputDirectory().mkdirs();
+        }
 
-			Set<File> files = filterFiles(getSourceDirectory());
-			if (files.isEmpty()) {
-				getLog().debug("There is no sources to generatate querydsl classes from (skipping)");
-				return;
-			}
+        getLog().debug("Using build context: " + buildContext);
 
-			StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-			Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
+        try {
+            JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+            if (compiler == null) {
+                throw new MojoExecutionException("You need to run build with JDK or have tools.jar on the classpath."
+                        + "If this occures during eclipse build make sure you run eclipse under JDK as well");
+            }
 
-			String compileClassPath = buildCompileClasspath();
+            Set<File> files = filterFiles(getSourceDirectory());
+            if (files.isEmpty()) {
+                getLog().debug("There is no sources to generatate querydsl classes from (skipping)");
+                return;
+            }
 
-			String processor = buildProcessor();
+            StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+            Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
 
-			List<String> compilerOptions = buildCompilerOptions(processor, compileClassPath);
+            String compileClassPath = buildCompileClasspath();
 
-			Writer out = null;
-			if (logOnlyOnError) {
-				out = new StringWriter();
-			}
-			CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
-			// Perform the compilation task.
-			Boolean rv = task.call();
-			if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
-				getLog().error(out.toString());
-			}
+            String processor = buildProcessor();
 
-			if (getOutputDirectory() != null) {
-				if (isForTest()) {
-					project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
-				} else {
-					project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
-				}
-				
-				buildContext.refresh(getOutputDirectory());
-			}
+            List<String> compilerOptions = buildCompilerOptions(processor, compileClassPath);
 
-		} catch (Exception e1) {
-			super.getLog().error("execute error", e1);
-			throw new MojoExecutionException(e1.getMessage());
-		}
-	}
+            Writer out = null;
+            if (logOnlyOnError) {
+                out = new StringWriter();
+            }
+            CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
+            // Perform the compilation task.
+            Boolean rv = task.call();
+            if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
+                getLog().error(out.toString());
+            }
 
-	protected abstract File getSourceDirectory();
+            if (getOutputDirectory() != null) {
+                if (isForTest()) {
+                    project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
+                } else {
+                    project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
+                }
 
-	protected abstract File getOutputDirectory();
+                buildContext.refresh(getOutputDirectory());
+            }
 
-	protected boolean isForTest() {
-		return false;
-	}
+        } catch (Exception e1) {
+            super.getLog().error("execute error", e1);
+            throw new MojoExecutionException(e1.getMessage());
+        }
+    }
+
+    protected abstract File getSourceDirectory();
+
+    protected abstract File getOutputDirectory();
+
+    protected boolean isForTest() {
+        return false;
+    }
 
 }
