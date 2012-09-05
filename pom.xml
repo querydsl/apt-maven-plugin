@@ -5,14 +5,28 @@
   <parent>
     <groupId>com.mysema.home</groupId>
     <artifactId>mysema-source</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
   </parent>
 
   <groupId>com.mysema.maven</groupId>
-  <artifactId>maven-apt-plugin</artifactId>
+  <artifactId>apt-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
   <version>1.0.4</version>
   <name>Maven - APT plugin</name>
+  
+  <licenses>
+    <license>
+      <name>The Apache Software License, Version 2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git@github.com:mysema/maven-apt-plugin.git</connection>
+    <url>git@github.com:mysema/maven-apt-plugin.git</url>
+  </scm>
+  
   
   <properties>
     <mvn.version>2.2.0</mvn.version>
