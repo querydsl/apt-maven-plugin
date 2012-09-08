@@ -25,20 +25,10 @@ public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
      * @parameter
      */
     protected File testOutputDirectory;
-
-    /**
-     * @parameter expression="${project.build.testSourceDirectory}" required=true
-     */
-    protected File sourceDirectory;
   
     @Override
     public File getOutputDirectory() {
         return testOutputDirectory != null ? testOutputDirectory : outputDirectory;
-    }
-
-    @Override
-    protected File getSourceDirectory() {
-        return sourceDirectory;
     }
 
     @Override

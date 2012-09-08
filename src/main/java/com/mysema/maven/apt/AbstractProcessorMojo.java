@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -191,8 +190,13 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         if (!showWarnings) {
             compilerOpts.put("nowarn", null);
         }
-
-        compilerOpts.put("sourcepath", getSourceDirectory().getCanonicalPath());
+        
+        StringBuilder builder = new StringBuilder();
+        for (File file : getSourceDirectories()) {
+            if (builder.length() > 0) builder.append(";");
+            builder.append(file.getCanonicalPath());
+        }
+        compilerOpts.put("sourcepath", builder.toString());
 
         // User options override default options
         if (compilerOptions != null) {
@@ -216,36 +220,34 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * also taking into account m2e {@link BuildContext} to filter-out unchanged
      * files when invoked as incremental build
      * 
-     * @param directory
-     *            source directory in which files are located for apt processing
+     * @param directories
+     *            source directories in which files are located for apt processing
      * 
      * @return files for apt processing. Returns empty set when there is no
      *         files to process
      */
-    private Set<File> filterFiles(File directory) {
-        // support for incremental build in m2e context
-        Scanner scanner = buildContext.newScanner(getSourceDirectory());
-        scanner.setIncludes(ALL_JAVA_FILES_FILTER);
-
-        // include based on the filter if specified
-        if (includes != null && includes.isEmpty() == false) {
-            String[] filters = includes.toArray(new String[includes.size()]);
+    private Set<File> filterFiles(Set<File> directories) {
+        String[] filters = ALL_JAVA_FILES_FILTER;
+        if (includes != null && !includes.isEmpty()) {
+            filters = includes.toArray(new String[includes.size()]);
             for (int i = 0; i < filters.length; i++) {
                 filters[i] = filters[i].replace('.', '/') + JAVA_FILE_FILTER;
             }
+        }
+        
+        Set<File> files = new HashSet<File>();        
+        for (File directory : directories) {
+            // support for incremental build in m2e context
+            Scanner scanner = buildContext.newScanner(directory);
             scanner.setIncludes(filters);
-        }
-        scanner.scan();
-
-        String[] includedFiles = scanner.getIncludedFiles();
-        if (includedFiles == null || includedFiles.length == 0) {
-            // there is no relevant sources to generate classes from
-            return Collections.emptySet();
-        }
-
-        Set<File> files = new HashSet<File>();
-        for (String includedFile : includedFiles) {
-            files.add(new File(scanner.getBasedir(), includedFile));
+            scanner.scan();
+            
+            String[] includedFiles = scanner.getIncludedFiles();
+            if (includedFiles != null) {
+                for (String includedFile : includedFiles) {
+                    files.add(new File(scanner.getBasedir(), includedFile));
+                }        
+            }
         }
         return files;
     }
@@ -254,6 +256,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
             getOutputDirectory().mkdirs();
         }
+        
+        Set<File> sourceDirectories = getSourceDirectories();
 
         getLog().debug("Using build context: " + buildContext);
 
@@ -264,7 +268,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                         + "If this occures during eclipse build make sure you run eclipse under JDK as well");
             }
 
-            Set<File> files = filterFiles(getSourceDirectory());
+            Set<File> files = filterFiles(sourceDirectories);
             if (files.isEmpty()) {
                 getLog().debug("There is no sources to generatate querydsl classes from (skipping)");
                 return;
@@ -306,9 +310,22 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         }
     }
 
-    protected abstract File getSourceDirectory();
-
     protected abstract File getOutputDirectory();
+    
+    @SuppressWarnings("unchecked")
+    protected Set<File> getSourceDirectories() {
+        File outputDirectory = getOutputDirectory();
+        Set<File> directories = new HashSet<File>();        
+        List<String> directoryNames = isForTest() ? project.getTestCompileSourceRoots() 
+                                                  : project.getCompileSourceRoots();
+        for (String name : directoryNames) {
+            File file = new File(name);
+            if (!file.equals(outputDirectory)) {
+                directories.add(file);    
+            }            
+        }
+        return directories;
+    }
 
     protected boolean isForTest() {
         return false;
