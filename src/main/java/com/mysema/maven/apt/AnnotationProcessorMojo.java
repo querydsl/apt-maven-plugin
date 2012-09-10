@@ -19,7 +19,7 @@ public class AnnotationProcessorMojo extends AbstractProcessorMojo {
     /**
      * @parameter
      */
-    protected File outputDirectory;
+    private File outputDirectory;
 
     @Override
     public File getOutputDirectory() {

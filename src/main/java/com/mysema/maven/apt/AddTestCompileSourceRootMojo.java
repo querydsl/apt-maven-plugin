@@ -23,17 +23,17 @@ public class AddTestCompileSourceRootMojo extends AbstractMojo {
     /**
      * @parameter expression="${project}" readonly=true required=true
      */
-    protected MavenProject project;
+    private MavenProject project;
     
     /**
      * @parameter
      */
-    protected File outputDirectory;
+    private File outputDirectory;
     
     /**
      * @parameter
      */
-    protected File testOutputDirectory;
+    private File testOutputDirectory;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

@@ -19,12 +19,12 @@ public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
     /**
      * @parameter
      */
-    protected File outputDirectory;
+    private File outputDirectory;
 
     /**
      * @parameter
      */
-    protected File testOutputDirectory;
+    private File testOutputDirectory;
   
     @Override
     public File getOutputDirectory() {

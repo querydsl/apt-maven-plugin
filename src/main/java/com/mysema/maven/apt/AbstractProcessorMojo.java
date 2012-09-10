@@ -45,37 +45,37 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     /**
      * @component
      */
-    protected BuildContext buildContext;
+    private BuildContext buildContext;
 
     /**
      * @parameter expression="${project}" readonly=true required=true
      */
-    protected MavenProject project;
+    private MavenProject project;
 
     /**
      * @parameter
      */
-    protected String[] processors;
+    private String[] processors;
 
     /**
      * @parameter
      */
-    protected String processor;
+    private String processor;
 
     /**
      * @parameter expression="${project.build.sourceEncoding}" required=true
      */
-    protected String sourceEncoding;
+    private String sourceEncoding;
 
     /**
      * @parameter
      */
-    protected Map<String, String> options;
+    private Map<String, String> options;
 
     /**
      * @parameter
      */
-    protected Map<String, String> compilerOptions;
+    private Map<String, String> compilerOptions;
 
     /**
      * A list of inclusion package filters for the apt processor.
@@ -93,17 +93,17 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    protected Set<String> includes = new HashSet<String>();
+    private Set<String> includes = new HashSet<String>();
 
     /**
      * @parameter
      */
-    protected boolean showWarnings = false;
+    private boolean showWarnings = false;
 
     /**
      * @parameter
      */
-    protected boolean logOnlyOnError = false;
+    private boolean logOnlyOnError = false;
 
     /**
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
@@ -193,7 +193,9 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         
         StringBuilder builder = new StringBuilder();
         for (File file : getSourceDirectories()) {
-            if (builder.length() > 0) builder.append(";");
+            if (builder.length() > 0) {
+                builder.append(";");
+            }
             builder.append(file.getCanonicalPath());
         }
         compilerOpts.put("sourcepath", builder.toString());
@@ -306,7 +308,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
         } catch (Exception e1) {
             super.getLog().error("execute error", e1);
-            throw new MojoExecutionException(e1.getMessage());
+            throw new MojoExecutionException(e1.getMessage(), e1);
         }
     }
 
