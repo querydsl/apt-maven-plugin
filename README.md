@@ -27,4 +27,6 @@ Here is an example of a configuration
         </executions>
     </plugin>
 
+Here is an example for usage with the m2e plugin https://github.com/mysema/maven-apt-plugin/wiki/m2e-usage
+
 
