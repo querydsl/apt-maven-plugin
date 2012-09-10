@@ -12,8 +12,8 @@ Here is an example of a configuration
 
     <plugin>
         <groupId>com.mysema.maven</groupId>
-        <artifactId>maven-apt-plugin</artifactId>
-        <version>1.0.3</version>
+        <artifactId>apt-maven-plugin</artifactId>
+        <version>1.0.5</version>
         <executions>
             <execution>
                 <goals>
@@ -26,5 +26,7 @@ Here is an example of a configuration
             </execution>
         </executions>
     </plugin>
+
+Here is an example for usage with the m2e plugin https://github.com/mysema/maven-apt-plugin/wiki/m2e-usage
 
 
