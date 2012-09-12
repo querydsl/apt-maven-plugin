@@ -11,7 +11,7 @@
   <groupId>com.mysema.maven</groupId>
   <artifactId>apt-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.0.5</version>
+  <version>1.0.6</version>
   <name>Maven - APT plugin</name>
   
   <licenses>
@@ -33,6 +33,17 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>0.0.7</version>
+    </dependency>
+   <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>1.5.8</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
       <version>${mvn.version}</version>
@@ -46,13 +57,7 @@
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-project</artifactId>
       <version>${mvn.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-build-api</artifactId>
-      <version>0.0.7</version>
-    </dependency>
+    </dependency>        
   </dependencies>
 
 </project>
