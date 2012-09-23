@@ -101,4 +101,12 @@ public class AnnotationProcessorMojoTest {
         assertTrue(new File(outputDir, "com/example/query/QEntity.java").exists());
     }
     
+    @Test
+    public void NoSources() throws MojoExecutionException {
+        mojo.setIncludes(Sets.newHashSet("xxx"));
+        mojo.execute();        
+        //EasyMock.verify(project);        
+        assertTrue(outputDir.list() == null || outputDir.list().length == 0);
+    }
+    
 }
