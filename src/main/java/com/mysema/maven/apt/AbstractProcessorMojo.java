@@ -333,4 +333,50 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         return false;
     }
 
+    public void setBuildContext(BuildContext buildContext) {
+        this.buildContext = buildContext;
+    }
+
+    public void setProject(MavenProject project) {
+        this.project = project;
+    }
+
+    public void setProcessors(String[] processors) {
+        this.processors = processors;
+    }
+
+    public void setProcessor(String processor) {
+        this.processor = processor;
+    }
+
+    public void setSourceEncoding(String sourceEncoding) {
+        this.sourceEncoding = sourceEncoding;
+    }
+
+    public void setOptions(Map<String, String> options) {
+        this.options = options;
+    }
+
+    public void setCompilerOptions(Map<String, String> compilerOptions) {
+        this.compilerOptions = compilerOptions;
+    }
+
+    public void setIncludes(Set<String> includes) {
+        this.includes = includes;
+    }
+
+    public void setShowWarnings(boolean showWarnings) {
+        this.showWarnings = showWarnings;
+    }
+
+    public void setLogOnlyOnError(boolean logOnlyOnError) {
+        this.logOnlyOnError = logOnlyOnError;
+    }
+
+    public void setPluginArtifacts(List<Artifact> pluginArtifacts) {
+        this.pluginArtifacts = pluginArtifacts;
+    }
+    
+    
+
 }

@@ -35,5 +35,13 @@ public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
     protected boolean isForTest(){
         return true;
     }
+
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public void setTestOutputDirectory(File testOutputDirectory) {
+        this.testOutputDirectory = testOutputDirectory;
+    }
     
 }

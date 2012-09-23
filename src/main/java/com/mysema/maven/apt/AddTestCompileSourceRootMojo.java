@@ -43,5 +43,17 @@ public class AddTestCompileSourceRootMojo extends AbstractMojo {
         }
         project.addTestCompileSourceRoot(directory.getAbsolutePath());
     }
+
+    public void setProject(MavenProject project) {
+        this.project = project;
+    }
+
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
+
+    public void setTestOutputDirectory(File testOutputDirectory) {
+        this.testOutputDirectory = testOutputDirectory;
+    }
     
 }

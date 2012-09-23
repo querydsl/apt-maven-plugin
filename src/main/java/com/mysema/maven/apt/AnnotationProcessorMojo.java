@@ -25,5 +25,9 @@ public class AnnotationProcessorMojo extends AbstractProcessorMojo {
     public File getOutputDirectory() {
         return outputDirectory;
     }
+
+    public void setOutputDirectory(File outputDirectory) {
+        this.outputDirectory = outputDirectory;
+    }
     
 }

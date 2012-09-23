@@ -29,6 +29,7 @@
   
   <properties>
     <mvn.version>2.2.0</mvn.version>
+    <querydsl.version>2.7.3</querydsl.version>
   </properties>
 
   <dependencies>
@@ -58,6 +59,45 @@
       <artifactId>maven-project</artifactId>
       <version>${mvn.version}</version>
     </dependency>        
+    
+    <!-- test -->
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <version>3.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>13.0.1</version>
+      <scope>test</scope>
+   </dependency>    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.4</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>    
+    
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-collections</artifactId>
+      <version>${querydsl.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-apt</artifactId>
+      <version>${querydsl.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
 </project>
