@@ -255,14 +255,26 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     }
 
     public void execute() throws MojoExecutionException {
-        if (getOutputDirectory() != null && !getOutputDirectory().exists()) {
-            getOutputDirectory().mkdirs();
+        if (getOutputDirectory() == null) {
+          return;
         }
         
+        if (!getOutputDirectory().exists()) {
+            getOutputDirectory().mkdirs();
+        }
+
+        // make sure to add compileSourceRoots also during configuration build in m2e context
+        if (isForTest()) {
+            project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
+        } else {
+            project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
+        }
+
         Set<File> sourceDirectories = getSourceDirectories();
 
         getLog().debug("Using build context: " + buildContext);
 
+        StandardJavaFileManager fileManager = null;
         try {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             if (compiler == null) {
@@ -276,7 +288,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 return;
             }
 
-            StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
+            fileManager = compiler.getStandardFileManager(null, null, null);
             Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
 
             String compileClassPath = buildCompileClasspath();
@@ -296,19 +308,19 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                 getLog().error(out.toString());
             }
 
-            if (getOutputDirectory() != null) {
-                if (isForTest()) {
-                    project.addTestCompileSourceRoot(getOutputDirectory().getAbsolutePath());
-                } else {
-                    project.addCompileSourceRoot(getOutputDirectory().getAbsolutePath());
-                }
-
-                buildContext.refresh(getOutputDirectory());
-            }
-
+            buildContext.refresh(getOutputDirectory());
         } catch (Exception e1) {
-            super.getLog().error("execute error", e1);
+            getLog().error("execute error", e1);
             throw new MojoExecutionException(e1.getMessage(), e1);
+            
+        } finally {
+            if (fileManager != null) {
+                try {
+                    fileManager.close();
+                } catch (Exception e) {
+                    getLog().warn("Unable to close fileManager", e);
+                }
+            }
         }
     }
 
@@ -322,7 +334,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
                                                   : project.getCompileSourceRoots();
         for (String name : directoryNames) {
             File file = new File(name);
-            if (!file.equals(outputDirectory)) {
+            if (!file.equals(outputDirectory) && file.exists()) {
                 directories.add(file);    
             }            
         }
@@ -376,7 +388,5 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     public void setPluginArtifacts(List<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
     }
-    
-    
 
 }
