@@ -8,7 +8,10 @@ import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
@@ -107,6 +110,25 @@ public class AnnotationProcessorMojoTest {
         mojo.execute();        
         //EasyMock.verify(project);        
         assertTrue(outputDir.list() == null || outputDir.list().length == 0);
+    }
+    
+    @Test
+    public void LogOnlyOnError() throws MojoExecutionException {
+        mojo.setLogOnlyOnError(true);
+        mojo.execute();        
+        EasyMock.verify(project);        
+        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+    }
+    
+    @Test
+    public void Artifacts() throws MojoExecutionException {
+        DefaultArtifact artifact = new DefaultArtifact("a", "b", VersionRange.createFromVersion("0.1"),
+                "compile", "jar", "", null);
+        artifact.setFile(new File("target/classes"));
+        mojo.setPluginArtifacts(Lists.<Artifact>newArrayList(artifact));
+        mojo.execute();        
+        EasyMock.verify(project);        
+        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
 }
