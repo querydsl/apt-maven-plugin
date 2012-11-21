@@ -44,7 +44,7 @@ public class AnnotationProcessorMojoTest {
         Log log = EasyMock.createMock(Log.class);
         BuildContext buildContext = new DefaultBuildContext();
         project = EasyMock.createMock(MavenProject.class); 
-        List sourceRoots = Lists.newArrayList("src/test/resources/project-to-test/src/main/java");
+        List sourceRoots = Lists.newArrayList("src/test/resources/project-to-test/src/main/java", "notExisting/sourceRoot/folder");
         URLClassLoader loader = (URLClassLoader) Thread.currentThread().getContextClassLoader();
         List classpath = ClassPathUtils.getClassPath(loader);
         EasyMock.expect(project.getCompileSourceRoots()).andReturn(sourceRoots);
