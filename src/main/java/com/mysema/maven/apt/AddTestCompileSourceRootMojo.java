@@ -17,6 +17,7 @@ import org.apache.maven.project.MavenProject;
  * 
  * @goal add-test-sources
  * @phase generate-sources
+ * @threadSafe true
  */
 public class AddTestCompileSourceRootMojo extends AbstractMojo {
     

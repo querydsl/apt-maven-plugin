@@ -13,6 +13,7 @@ import java.io.File;
  * @goal test-process
  * @phase generate-test-sources
  * @requiresDependencyResolution test
+ * @threadSafe true
  */
 public class TestAnnotationProcessorMojo extends AbstractProcessorMojo {
 

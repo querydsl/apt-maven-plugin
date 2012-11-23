@@ -13,6 +13,7 @@ import java.io.File;
  * @goal process
  * @phase generate-sources
  * @requiresDependencyResolution compile
+ * @threadSafe true
  */
 public class AnnotationProcessorMojo extends AbstractProcessorMojo {
 
