@@ -13,7 +13,7 @@ Here is an example of a configuration
     <plugin>
         <groupId>com.mysema.maven</groupId>
         <artifactId>apt-maven-plugin</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
         <executions>
             <execution>
                 <goals>
