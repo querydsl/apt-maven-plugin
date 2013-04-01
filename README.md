@@ -1,7 +1,7 @@
 apt-maven-plugin
 ================
 
-maven-apt-plugin provides Maven integration of the Java 6 APT functionality.
+apt-maven-plugin provides Maven integration of the Java 6 APT functionality.
 
 The supported goals are
 
