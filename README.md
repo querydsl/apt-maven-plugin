@@ -21,7 +21,7 @@ Here is an example of a configuration
                 </goals>
                 <configuration>
                     <outputDirectory>target/generated-sources/java</outputDirectory>
-                    <processor>com.mysema.rdfbean.query.BeanAnnotationProcessor</processor>
+                    <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
                 </configuration>
             </execution>
         </executions>
