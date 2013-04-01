@@ -1,4 +1,4 @@
-maven-apt-plugin
+apt-maven-plugin
 ================
 
 maven-apt-plugin provides Maven integration of the Java 6 APT functionality.
@@ -27,6 +27,6 @@ Here is an example of a configuration
         </executions>
     </plugin>
 
-Here is an example for usage with the m2e plugin https://github.com/mysema/maven-apt-plugin/wiki/m2e-usage
+Here is an example for usage with the m2e plugin https://github.com/mysema/apt-maven-plugin/wiki/m2e-usage
 
 
