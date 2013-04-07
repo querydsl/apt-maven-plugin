@@ -284,7 +284,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             Set<File> files = filterFiles(sourceDirectories);
             if (files.isEmpty()) {
-                getLog().debug("There is no sources to generatate querydsl classes from (skipping)");
+                getLog().debug("No Java sources found (skipping)");
                 return;
             }
 
