@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DefaultArtifact;
@@ -18,6 +19,7 @@ import org.apache.maven.project.MavenProject;
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sonatype.plexus.build.incremental.BuildContext;
 import org.sonatype.plexus.build.incremental.DefaultBuildContext;
@@ -102,6 +104,18 @@ public class AnnotationProcessorMojoTest {
         mojo.execute();        
         EasyMock.verify(project);        
         assertTrue(new File(outputDir, "com/example/query/QEntity.java").exists());
+    }
+    
+    @Test
+    @Ignore
+    public void NullOptions() throws MojoExecutionException {
+        Map<String, String> options = Maps.newHashMap();
+        options.put("querydsl.packageSuffix", ".query");
+        options.put("querydsl.prefix", null);
+        mojo.setOptions(options);
+        mojo.execute();        
+        EasyMock.verify(project);        
+        assertTrue(new File(outputDir, "com/example/query/Entity.java").exists());
     }
     
     @Test

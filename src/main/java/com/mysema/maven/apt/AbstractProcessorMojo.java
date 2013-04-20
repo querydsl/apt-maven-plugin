@@ -179,7 +179,12 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
         if (options != null) {
             for (Map.Entry<String, String> entry : options.entrySet()) {
-                compilerOpts.put("A" + entry.getKey() + "=" + entry.getValue(), null);
+                if (entry.getValue() != null) {
+                    compilerOpts.put("A" + entry.getKey() + "=" + entry.getValue(), null);    
+                } else {
+                    compilerOpts.put("A" + entry.getKey() + "=", null);
+                }
+                
             }
         }
 
