@@ -29,4 +29,8 @@ Here is an example of a configuration
 
 Here is an example for usage with the m2e plugin https://github.com/mysema/apt-maven-plugin/wiki/m2e-usage
 
+If you're using AspectJ to introduce artifacts into classes (fields, methods or annotations), then 
+`apt-maven-plugin` will not work properly and classpath inspecting tools need to be used, such as GenericExporter, 
+if you use Querydsl.
+
 
