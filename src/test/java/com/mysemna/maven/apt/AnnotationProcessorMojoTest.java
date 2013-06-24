@@ -1,5 +1,6 @@
 package com.mysemna.maven.apt;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -72,6 +73,7 @@ public class AnnotationProcessorMojoTest {
     @After
     public void tearDown() throws IOException {
         FileUtils.delete(outputDir);
+        System.setProperty("maven.apt.skip", "");
     }
     
     @Test    
@@ -79,6 +81,13 @@ public class AnnotationProcessorMojoTest {
         mojo.execute();        
         EasyMock.verify(project);        
         assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+    }
+    
+    @Test
+    public void Skip() throws MojoExecutionException {
+    	System.setProperty("maven.apt.skip", "true");
+    	mojo.execute();                
+        assertFalse(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test

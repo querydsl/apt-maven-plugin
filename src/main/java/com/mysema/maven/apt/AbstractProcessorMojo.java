@@ -263,7 +263,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         if (getOutputDirectory() == null) {
         	return;
         }        
-        if (System.getProperty("maven.apt.skip") != null) {
+        if ("true".equals(System.getProperty("maven.apt.skip"))) {
         	return;
         }
         
