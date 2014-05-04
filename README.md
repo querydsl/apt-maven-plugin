@@ -2,6 +2,8 @@
 
 apt-maven-plugin provides Maven integration of the Java 6 APT functionality.
 
+[![Build Status](https://travis-ci.org/querydsl/apt-maven-plugin.svg?branch=master)](https://travis-ci.org/querydsl/apt-maven-plugin)
+
 The supported goals are
 
     process - to process main sources
