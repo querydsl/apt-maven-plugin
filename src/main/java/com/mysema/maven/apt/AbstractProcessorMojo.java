@@ -109,6 +109,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
      */
     private List<Artifact> pluginArtifacts;
+    
+    /**
+     * @parameter
+     */
+    private boolean ignoreDelta = false;
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -245,7 +250,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         Set<File> files = new HashSet<File>();        
         for (File directory : directories) {
             // support for incremental build in m2e context
-            Scanner scanner = buildContext.newScanner(directory);
+            Scanner scanner = buildContext.newScanner(directory, ignoreDelta);
             scanner.setIncludes(filters);
             scanner.scan();
             
