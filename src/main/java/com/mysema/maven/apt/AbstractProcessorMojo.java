@@ -350,12 +350,13 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     @SuppressWarnings("unchecked")
     protected Set<File> getSourceDirectories() {
         File outputDirectory = getOutputDirectory();
+        String outputPath = outputDirectory.getAbsolutePath();
         Set<File> directories = new HashSet<File>();        
         List<String> directoryNames = isForTest() ? project.getTestCompileSourceRoots() 
                                                   : project.getCompileSourceRoots();
         for (String name : directoryNames) {
             File file = new File(name);
-            if (!file.equals(outputDirectory) && file.exists()) {
+            if (!file.getAbsolutePath().equals(outputPath) && file.exists()) {
                 directories.add(file);    
             }            
         }
