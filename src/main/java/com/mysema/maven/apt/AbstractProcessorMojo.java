@@ -109,6 +109,11 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
      */
     private List<Artifact> pluginArtifacts;
+    
+    /**
+     * @parameter
+     */
+    private boolean ignoreDelta = true;
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
@@ -245,11 +250,19 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         Set<File> files = new HashSet<File>();        
         for (File directory : directories) {
             // support for incremental build in m2e context
-            Scanner scanner = buildContext.newScanner(directory);
+            Scanner scanner = buildContext.newScanner(directory, false);
             scanner.setIncludes(filters);
-            scanner.scan();
-            
+            scanner.scan();            
             String[] includedFiles = scanner.getIncludedFiles();
+            
+            // get all sources if ignoreDelta and at least one source file has changed
+            if (ignoreDelta && buildContext.isIncremental() && includedFiles != null && includedFiles.length > 0) {
+                scanner = buildContext.newScanner(directory, true);
+                scanner.setIncludes(filters);
+                scanner.scan();            
+                includedFiles = scanner.getIncludedFiles();
+            }
+            
             if (includedFiles != null) {
                 for (String includedFile : includedFiles) {
                     files.add(new File(scanner.getBasedir(), includedFile));
@@ -337,12 +350,13 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     @SuppressWarnings("unchecked")
     protected Set<File> getSourceDirectories() {
         File outputDirectory = getOutputDirectory();
+        String outputPath = outputDirectory.getAbsolutePath();
         Set<File> directories = new HashSet<File>();        
         List<String> directoryNames = isForTest() ? project.getTestCompileSourceRoots() 
                                                   : project.getCompileSourceRoots();
         for (String name : directoryNames) {
             File file = new File(name);
-            if (!file.equals(outputDirectory) && file.exists()) {
+            if (!file.getAbsolutePath().equals(outputPath) && file.exists()) {
                 directories.add(file);    
             }            
         }
