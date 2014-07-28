@@ -113,7 +113,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     /**
      * @parameter
      */
-    private boolean ignoreDelta = false;
+    private boolean ignoreDelta = true;
 
     @SuppressWarnings("unchecked")
     private String buildCompileClasspath() {
