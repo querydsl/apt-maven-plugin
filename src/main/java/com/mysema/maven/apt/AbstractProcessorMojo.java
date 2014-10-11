@@ -247,7 +247,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         Set<File> files = new HashSet<File>();        
         for (File directory : directories) {
             // support for incremental build in m2e context
-            Scanner scanner = buildContext.newScanner(directory, true);
+            Scanner scanner = buildContext.newScanner(directory, false);
             scanner.setIncludes(filters);
             scanner.scan();            
             String[] includedFiles = scanner.getIncludedFiles();
