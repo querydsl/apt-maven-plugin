@@ -5,23 +5,19 @@
  */
 package com.mysema.maven.apt;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
+import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+import java.util.*;
 
+import com.google.common.io.Files;
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -109,7 +105,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
      */
     private List<Artifact> pluginArtifacts;
-    
+
     /**
      * @parameter
      */
@@ -169,7 +165,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         }
     }
 
-    private List<String> buildCompilerOptions(String processor, String compileClassPath) throws IOException {
+    private List<String> buildCompilerOptions(String processor, String compileClassPath,
+                                              String outputDirectory) throws IOException {
         Map<String, String> compilerOpts = new LinkedHashMap<String, String>();
 
         // Default options
@@ -193,8 +190,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             }
         }
 
-        if (getOutputDirectory() != null) {
-            compilerOpts.put("s", getOutputDirectory().getPath());
+        if (outputDirectory != null) {
+            compilerOpts.put("s", outputDirectory);
         }
 
         if (!showWarnings) {
@@ -250,19 +247,19 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         Set<File> files = new HashSet<File>();        
         for (File directory : directories) {
             // support for incremental build in m2e context
-            Scanner scanner = buildContext.newScanner(directory, false);
+            Scanner scanner = buildContext.newScanner(directory, true);
             scanner.setIncludes(filters);
             scanner.scan();            
             String[] includedFiles = scanner.getIncludedFiles();
-            
+
             // get all sources if ignoreDelta and at least one source file has changed
             if (ignoreDelta && buildContext.isIncremental() && includedFiles != null && includedFiles.length > 0) {
                 scanner = buildContext.newScanner(directory, true);
                 scanner.setIncludes(filters);
-                scanner.scan();            
+                scanner.scan();
                 includedFiles = scanner.getIncludedFiles();
             }
-            
+
             if (includedFiles != null) {
                 for (String includedFile : includedFiles) {
                     files.add(new File(scanner.getBasedir(), includedFile));
@@ -316,7 +313,14 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             String processor = buildProcessor();
 
-            List<String> compilerOptions = buildCompilerOptions(processor, compileClassPath);
+            String outputDirectory = getOutputDirectory().getPath();
+            File tempDirectory = null;
+            if (buildContext.isIncremental()) {
+                tempDirectory = Files.createTempDir();
+                outputDirectory = tempDirectory.getAbsolutePath();
+            }
+
+            List<String> compilerOptions = buildCompilerOptions(processor, compileClassPath, outputDirectory);
 
             Writer out = null;
             if (logOnlyOnError) {
@@ -324,6 +328,12 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             }
             CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
             // Perform the compilation task.
+
+            if (tempDirectory != null) {
+                FileSync.syncFiles(tempDirectory, getOutputDirectory());
+                FileUtils.deleteDirectory(tempDirectory);
+            }
+
             Boolean rv = task.call();
             if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
                 getLog().error(out.toString());
