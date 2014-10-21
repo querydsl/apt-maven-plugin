@@ -1,4 +1,4 @@
-package com.mysemna.maven.apt;
+package com.mysema.maven.apt;
 
 import java.io.File;
 import java.io.IOException;
