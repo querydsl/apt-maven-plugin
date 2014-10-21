@@ -1,4 +1,4 @@
-package com.mysemna.maven.apt;
+package com.mysema.maven.apt;
 
 import static org.junit.Assert.assertTrue;
 
@@ -8,8 +8,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
 import org.junit.Test;
-
-import com.mysema.maven.apt.AddTestCompileSourceRootMojo;
 
 public class AddTestCompileSourceRootMojoTest {
 
