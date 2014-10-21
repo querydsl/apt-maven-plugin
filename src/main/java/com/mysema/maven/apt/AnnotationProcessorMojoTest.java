@@ -1,4 +1,4 @@
-package com.mysemna.maven.apt;
+package com.mysema.maven.apt;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +28,6 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mysema.maven.apt.AnnotationProcessorMojo;
 import com.mysema.query.apt.QuerydslAnnotationProcessor;
 import com.mysema.util.FileUtils;
 
@@ -80,14 +79,14 @@ public class AnnotationProcessorMojoTest {
     public void Execute() throws MojoExecutionException {        
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test
     public void Skip() throws MojoExecutionException {
     	System.setProperty("maven.apt.skip", "true");
     	mojo.execute();                
-        assertFalse(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertFalse(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test
@@ -96,7 +95,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setProcessors(new String[]{QuerydslAnnotationProcessor.class.getName()});
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test
@@ -104,7 +103,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setIncludes(Sets.newHashSet("com/example/**"));
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test
@@ -112,7 +111,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setOptions(Collections.singletonMap("querydsl.packageSuffix", ".query"));
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/query/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/query/QEntity.java").exists());
     }
     
     @Test
@@ -124,7 +123,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setOptions(options);
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/query/Entity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/query/Entity.java").exists());
     }
     
     @Test
@@ -132,7 +131,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setIncludes(Sets.newHashSet("xxx"));
         mojo.execute();        
         //EasyMock.verify(project);        
-        assertTrue(outputDir.list() == null || outputDir.list().length == 0);
+        Assert.assertTrue(outputDir.list() == null || outputDir.list().length == 0);
     }
     
     @Test
@@ -140,7 +139,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setLogOnlyOnError(true);
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
     @Test
@@ -151,7 +150,7 @@ public class AnnotationProcessorMojoTest {
         mojo.setPluginArtifacts(Lists.<Artifact>newArrayList(artifact));
         mojo.execute();        
         EasyMock.verify(project);        
-        assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
+        Assert.assertTrue(new File(outputDir, "com/example/QEntity.java").exists());
     }
     
 }

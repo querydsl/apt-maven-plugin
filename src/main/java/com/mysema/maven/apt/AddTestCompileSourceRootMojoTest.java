@@ -1,4 +1,4 @@
-package com.mysemna.maven.apt;
+package com.mysema.maven.apt;
 
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +23,7 @@ public class AddTestCompileSourceRootMojoTest {
         mojo.setOutputDirectory(output);
         mojo.execute();
         
-        assertTrue(project.getTestCompileSourceRoots().contains(output.getAbsolutePath()));
+        Assert.assertTrue(project.getTestCompileSourceRoots().contains(output.getAbsolutePath()));
     }
 
 }
