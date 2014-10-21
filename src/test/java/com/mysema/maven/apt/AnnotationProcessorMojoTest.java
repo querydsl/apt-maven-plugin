@@ -1,4 +1,4 @@
-package com.mysemna.maven.apt;
+package com.mysema.maven.apt;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +28,6 @@ import org.sonatype.plexus.build.incremental.DefaultBuildContext;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mysema.maven.apt.AnnotationProcessorMojo;
 import com.mysema.query.apt.QuerydslAnnotationProcessor;
 import com.mysema.util.FileUtils;
 
