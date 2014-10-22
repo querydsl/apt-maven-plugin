@@ -43,7 +43,7 @@ public class FileSync {
 
     private static void copyIfChanged(File source, File target) throws IOException {
         if (!target.exists()) {
-            source.renameTo(target);
+            Files.copy(source, target);
         } else {
             boolean changed = source.length() != target.length()
                     || FileUtils.checksumCRC32(source) != FileUtils.checksumCRC32(target);
