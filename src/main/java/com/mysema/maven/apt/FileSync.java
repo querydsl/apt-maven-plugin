@@ -44,7 +44,7 @@ public class FileSync {
     private static void copyIfChanged(File source, File target) throws IOException {
         if (target.exists()) {
             if (source.length() == target.length() && FileUtils.checksumCRC32(source) == FileUtils.checksumCRC32(target)) {
-                return;   
+                return;
             } else {
                 target.delete();
             }
