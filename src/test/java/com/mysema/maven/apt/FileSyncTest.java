@@ -2,9 +2,9 @@ package com.mysema.maven.apt;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Joiner;
 import com.google.common.io.Files;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -49,13 +49,12 @@ public class FileSyncTest {
 
     @Test
     public void sync3() throws IOException {
-        Joiner joiner = Joiner.on(File.separator);
         File source = Files.createTempDir();
         File target = Files.createTempDir();
-        File sourceFile1 = new File(source, joiner.join("com","mysema","querydsl","Query.java"));
-        File sourceFile2 = new File(source, joiner.join("com","mysema","Entity.java"));
-        File targetFile1 = new File(target, joiner.join("com","mysema","querydsl","OldQuery.java"));
-        File targetFile2 = new File(target, joiner.join("com","mysema","querydsl","support","Example.java"));
+        File sourceFile1 = Paths.get(source.getAbsolutePath(), "com","mysema","querydsl","Query.java").toFile();
+        File sourceFile2 = Paths.get(source.getAbsolutePath(), "com","mysema","Entity.java").toFile();
+        File targetFile1 = Paths.get(target.getAbsolutePath(), "com","mysema","querydsl","OldQuery.java").toFile();
+        File targetFile2 = Paths.get(target.getAbsolutePath(), "com","mysema","querydsl","support","Example.java").toFile();
         sourceFile1.getParentFile().mkdirs();
         sourceFile2.getParentFile().mkdirs();
         targetFile1.getParentFile().mkdirs();
@@ -69,8 +68,8 @@ public class FileSyncTest {
         assertFalse(targetFile1.exists());
         assertFalse(targetFile2.exists());
         assertFalse(targetFile2.getParentFile().exists());
-        assertTrue(new File(target, joiner.join("com","mysema","querydsl","Query.java")).exists());
-        assertTrue(new File(target, joiner.join("com","mysema","Entity.java")).exists());
+        assertTrue(Paths.get(target.getAbsolutePath(), "com","mysema","querydsl","Query.java").toFile().exists());
+        assertTrue(Paths.get(target.getAbsolutePath(), "com","mysema","Entity.java").toFile().exists());
     }
 
 }
