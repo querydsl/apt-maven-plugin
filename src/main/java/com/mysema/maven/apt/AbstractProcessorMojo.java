@@ -15,6 +15,9 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
@@ -252,6 +255,14 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             scanner.scan();            
             String[] includedFiles = scanner.getIncludedFiles();
 
+            // check also for possible deletions
+            if (buildContext.isIncremental() && (includedFiles == null || includedFiles.length == 0)) {
+                scanner = buildContext.newDeleteScanner(directory);
+                scanner.setIncludes(filters);
+                scanner.scan();
+                includedFiles = scanner.getIncludedFiles();
+            }
+
             // get all sources if ignoreDelta and at least one source file has changed
             if (ignoreDelta && buildContext.isIncremental() && includedFiles != null && includedFiles.length > 0) {
                 scanner = buildContext.newScanner(directory, true);
@@ -293,6 +304,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         getLog().debug("Using build context: " + buildContext);
 
         StandardJavaFileManager fileManager = null;
+
         try {
             JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
             if (compiler == null) {
@@ -315,6 +327,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             String outputDirectory = getOutputDirectory().getPath();
             File tempDirectory = null;
+
             if (buildContext.isIncremental()) {
                 tempDirectory = Files.createTempDir();
                 outputDirectory = tempDirectory.getAbsolutePath();
@@ -326,17 +339,21 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             if (logOnlyOnError) {
                 out = new StringWriter();
             }
-            CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
-            // Perform the compilation task.
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            try {
+                CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
+                Future<Boolean> future = executor.submit(task);
+                Boolean rv = future.get();
 
-            if (tempDirectory != null) {
-                FileSync.syncFiles(tempDirectory, getOutputDirectory());
-                FileUtils.deleteDirectory(tempDirectory);
-            }
-
-            Boolean rv = task.call();
-            if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
-                getLog().error(out.toString());
+                if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
+                    getLog().error(out.toString());
+                }
+            } finally {
+                executor.shutdown();
+                if (tempDirectory != null) {
+                    FileSync.syncFiles(tempDirectory, getOutputDirectory());
+                    FileUtils.deleteDirectory(tempDirectory);
+                }
             }
 
             buildContext.refresh(getOutputDirectory());

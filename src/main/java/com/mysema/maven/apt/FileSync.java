@@ -42,16 +42,15 @@ public class FileSync {
     }
 
     private static void copyIfChanged(File source, File target) throws IOException {
-        if (!target.exists()) {
-            if (!source.renameTo(target)) {
-                Files.move(source, target);
+        if (target.exists()) {
+            if (source.length() == target.length() && FileUtils.checksumCRC32(source) == FileUtils.checksumCRC32(target)) {
+                return;   
+            } else {
+                target.delete();
             }
-        } else {
-            boolean changed = source.length() != target.length()
-                    || FileUtils.checksumCRC32(source) != FileUtils.checksumCRC32(target);
-            if (changed) {
-                Files.copy(source, target);
-            }
+        }
+        if (!source.renameTo(target)) {
+            Files.move(source, target);
         }
     }
 
