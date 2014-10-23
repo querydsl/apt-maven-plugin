@@ -55,15 +55,20 @@ public class FileSyncTest {
         File sourceFile1 = new File(source, joiner.join("com","mysema","querydsl","Query.java"));
         File sourceFile2 = new File(source, joiner.join("com","mysema","Entity.java"));
         File targetFile1 = new File(target, joiner.join("com","mysema","querydsl","OldQuery.java"));
+        File targetFile2 = new File(target, joiner.join("com","mysema","querydsl","support","Example.java"));
         sourceFile1.getParentFile().mkdirs();
         sourceFile2.getParentFile().mkdirs();
         targetFile1.getParentFile().mkdirs();
+        targetFile2.getParentFile().mkdirs();
         Files.write("abc", sourceFile1, Charsets.UTF_8);
         Files.write("def", sourceFile2, Charsets.UTF_8);
         Files.write("ghi", targetFile1, Charsets.UTF_8);
+        Files.write("jkl", targetFile2, Charsets.UTF_8);
 
         FileSync.syncFiles(source, target);
         assertFalse(targetFile1.exists());
+        assertFalse(targetFile2.exists());
+        assertFalse(targetFile2.getParentFile().exists());
         assertTrue(new File(target, joiner.join("com","mysema","querydsl","Query.java")).exists());
         assertTrue(new File(target, joiner.join("com","mysema","Entity.java")).exists());
     }
