@@ -329,7 +329,7 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             if (buildContext.isIncremental()) {
                 tempDirectory = new File(project.getBuild().getDirectory(), "apt"+System.currentTimeMillis());
-                tempDirectory.mkdir();
+                tempDirectory.mkdirs();
                 outputDirectory = tempDirectory.getAbsolutePath();
             }
 
