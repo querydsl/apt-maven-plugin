@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -329,7 +328,8 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             File tempDirectory = null;
 
             if (buildContext.isIncremental()) {
-                tempDirectory = Files.createTempDir();
+                tempDirectory = new File(project.getBuild().getDirectory(), "apt"+System.currentTimeMillis());
+                tempDirectory.mkdir();
                 outputDirectory = tempDirectory.getAbsolutePath();
             }
 
