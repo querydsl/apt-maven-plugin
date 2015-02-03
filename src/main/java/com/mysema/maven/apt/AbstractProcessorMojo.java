@@ -291,30 +291,30 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @param diagnostics
      */
     private void processDiagnostics(final List<Diagnostic<? extends JavaFileObject>> diagnostics) {
-      for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-        if (diagnostic != null) {
-          final JavaFileObject javaFileObject = diagnostic.getSource();
-          if (javaFileObject != null) { // message was created without element parameter
-            final File file = new File(javaFileObject.toUri().getPath());
-            final Kind kind = diagnostic.getKind();
-            final int lineNumber = (int) diagnostic.getLineNumber();
-            final int columnNumber = (int) diagnostic.getColumnNumber();
-            final String message = diagnostic.getMessage(Locale.getDefault());
-            switch (kind) {
-              case NOTE:
-              case OTHER:
-              	break;
-              case WARNING:
-              case MANDATORY_WARNING:
-              	buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_WARNING, null);
-                break;
-              default:
-              	buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_ERROR, null);
-               break;
+        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+            if (diagnostic != null) {
+                final JavaFileObject javaFileObject = diagnostic.getSource();
+                if (javaFileObject != null) { // message was created without element parameter
+                    final File file = new File(javaFileObject.toUri().getPath());
+                    final Kind kind = diagnostic.getKind();
+                    final int lineNumber = (int) diagnostic.getLineNumber();
+                    final int columnNumber = (int) diagnostic.getColumnNumber();
+                    final String message = diagnostic.getMessage(Locale.getDefault());
+                    switch (kind) {
+                        case NOTE:
+                        case OTHER:
+                            break;
+                        case WARNING:
+                        case MANDATORY_WARNING:
+                            buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_WARNING, null);
+                            break;
+                        default:
+                            buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_ERROR, null);
+                            break;
+                    }
+                }
             }
-          }
         }
-      }
     }
 
     public void execute() throws MojoExecutionException {
