@@ -9,7 +9,7 @@ import javax.tools.Diagnostic;
 import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.DiagnosticListener;
+import javax.tools.DiagnosticCollector;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
@@ -292,27 +292,25 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      */
     private void processDiagnostics(final List<Diagnostic<? extends JavaFileObject>> diagnostics) {
         for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
-            if (diagnostic != null) {
-                JavaFileObject javaFileObject = diagnostic.getSource();
-                if (javaFileObject != null) { // message was created without element parameter
-                    File file = new File(javaFileObject.toUri().getPath());
-                    Kind kind = diagnostic.getKind();
-                    int lineNumber = (int) diagnostic.getLineNumber();
-                    int columnNumber = (int) diagnostic.getColumnNumber();
-                    String message = diagnostic.getMessage(Locale.getDefault());
-                    switch (kind) {
-                        case ERROR:
-                            buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_ERROR, null);
-                            break;
-                        case WARNING:
-                        case MANDATORY_WARNING:
-                            buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_WARNING, null);
-                            break;
-                        case NOTE:
-                        case OTHER:
-                        default:
-                            break;
-                    }
+            JavaFileObject javaFileObject = diagnostic.getSource();
+            if (javaFileObject != null) { // message was created without element parameter
+                File file = new File(javaFileObject.toUri().getPath());
+                Kind kind = diagnostic.getKind();
+                int lineNumber = (int) diagnostic.getLineNumber();
+                int columnNumber = (int) diagnostic.getColumnNumber();
+                String message = diagnostic.getMessage(Locale.getDefault());
+                switch (kind) {
+                    case ERROR:
+                        buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_ERROR, null);
+                        break;
+                    case WARNING:
+                    case MANDATORY_WARNING:
+                        buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_WARNING, null);
+                        break;
+                    case NOTE:
+                    case OTHER:
+                    default:
+                        break;
                 }
             }
         }
@@ -384,21 +382,15 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             }
             ExecutorService executor = Executors.newSingleThreadExecutor();
             try {
-                // the access to buildContext has to made from the current thread (uses ThreadLocal)
-                final List<Diagnostic<? extends JavaFileObject>> diagnostics = new ArrayList<Diagnostic<? extends JavaFileObject>>();
-                CompilationTask task = compiler.getTask(out, fileManager, new DiagnosticListener<JavaFileObject>() {
-                    @Override
-                    public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-                        diagnostics.add(diagnostic);
-                    }
-                }, compilerOptions, null, compilationUnits1);
+                DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
+                CompilationTask task = compiler.getTask(out, fileManager, diagnosticCollector, compilerOptions, null, compilationUnits1);
                 Future<Boolean> future = executor.submit(task);
                 Boolean rv = future.get();
 
                 if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
                     getLog().error(out.toString());
                 }
-                processDiagnostics(diagnostics);
+                processDiagnostics(diagnosticCollector.getDiagnostics());
             } finally {
                 executor.shutdown();
                 if (tempDirectory != null) {
