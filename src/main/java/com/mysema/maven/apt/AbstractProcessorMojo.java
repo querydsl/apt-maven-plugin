@@ -5,8 +5,11 @@
  */
 package com.mysema.maven.apt;
 
+import javax.tools.Diagnostic;
+import javax.tools.Diagnostic.Kind;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
+import javax.tools.DiagnosticCollector;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
@@ -279,6 +282,40 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         return files;
     }
 
+    /**
+     * Add messages through the buildContext:
+     * <ul>
+     *   <li>cli build creates log output</li>
+     *   <li>m2e build creates markers for eclipse</li>
+     * </ul>
+     * @param diagnostics
+     */
+    private void processDiagnostics(final List<Diagnostic<? extends JavaFileObject>> diagnostics) {
+        for (Diagnostic<? extends JavaFileObject> diagnostic : diagnostics) {
+            JavaFileObject javaFileObject = diagnostic.getSource();
+            if (javaFileObject != null) { // message was created without element parameter
+                File file = new File(javaFileObject.toUri().getPath());
+                Kind kind = diagnostic.getKind();
+                int lineNumber = (int) diagnostic.getLineNumber();
+                int columnNumber = (int) diagnostic.getColumnNumber();
+                String message = diagnostic.getMessage(Locale.getDefault());
+                switch (kind) {
+                    case ERROR:
+                        buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_ERROR, null);
+                        break;
+                    case WARNING:
+                    case MANDATORY_WARNING:
+                        buildContext.addMessage(file, lineNumber, columnNumber, message, BuildContext.SEVERITY_WARNING, null);
+                        break;
+                    case NOTE:
+                    case OTHER:
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
     public void execute() throws MojoExecutionException {
         if (getOutputDirectory() == null) {
         	return;
@@ -319,6 +356,10 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
 
             fileManager = compiler.getStandardFileManager(null, null, null);
             Iterable<? extends JavaFileObject> compilationUnits1 = fileManager.getJavaFileObjectsFromFiles(files);
+            // clean all markers
+            for (JavaFileObject javaFileObject : compilationUnits1) {
+            	buildContext.removeMessages(new File(javaFileObject.toUri().getPath()));
+            }
 
             String compileClassPath = buildCompileClasspath();
 
@@ -341,13 +382,15 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             }
             ExecutorService executor = Executors.newSingleThreadExecutor();
             try {
-                CompilationTask task = compiler.getTask(out, fileManager, null, compilerOptions, null, compilationUnits1);
+                DiagnosticCollector<JavaFileObject> diagnosticCollector = new DiagnosticCollector<JavaFileObject>();
+                CompilationTask task = compiler.getTask(out, fileManager, diagnosticCollector, compilerOptions, null, compilationUnits1);
                 Future<Boolean> future = executor.submit(task);
                 Boolean rv = future.get();
 
                 if (Boolean.FALSE.equals(rv) && logOnlyOnError) {
                     getLog().error(out.toString());
                 }
+                processDiagnostics(diagnosticCollector.getDiagnostics());
             } finally {
                 executor.shutdown();
                 if (tempDirectory != null) {
