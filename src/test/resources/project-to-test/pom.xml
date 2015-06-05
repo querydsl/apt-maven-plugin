@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.mysema.test</groupId>
@@ -9,28 +9,15 @@
   <name>Maven - Version plugin</name>
 
   <properties>
-    <querydsl.version>2.7.3</querydsl.version>
+    <querydsl.version>3.6.3</querydsl.version>
   </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>com.mysema.querydsl</groupId>
-      <artifactId>querydsl-collections</artifactId>
-      <version>${querydsl.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.mysema.querydsl</groupId>
-      <artifactId>querydsl-apt</artifactId>
-      <version>${querydsl.version}</version>
-    </dependency>    
-  </dependencies>
 
   <build>
     <plugins>
       <plugin>
         <groupId>com.mysema.maven</groupId>
         <artifactId>apt-maven-plugin</artifactId>
-        <version>1.0.5</version>
+        <version>1.1.3</version>
         <executions>
           <execution>
             <goals>
@@ -41,17 +28,22 @@
               <processor>com.mysema.query.apt.QuerydslAnnotationProcessor</processor>
             </configuration>
           </execution>
+          <execution>
+            <id>test-sources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>test-process</goal>
+            </goals>
+            <configuration>
+              <testOutputDirectory>target/generated-test-sources/java</testOutputDirectory>
+              <processor>com.mysema.query.apt.QuerydslAnnotationProcessor</processor>
+            </configuration>
+          </execution>
         </executions>
         <dependencies>
           <dependency>
             <groupId>com.mysema.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
-            <version>${querydsl.version}</version>
-          </dependency>
-          <dependency>
-            <groupId>com.mysema.querydsl</groupId>
-            <artifactId>querydsl-jpa</artifactId>
-            <classifier>apt</classifier>
             <version>${querydsl.version}</version>
           </dependency>
         </dependencies>
