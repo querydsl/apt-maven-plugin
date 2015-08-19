@@ -22,8 +22,8 @@
   </licenses>
   
   <scm>
-    <connection>scm:git:git@github.com:mysema/maven-apt-plugin.git</connection>
-    <url>git@github.com:mysema/maven-apt-plugin.git</url>
+    <connection>scm:git:git@github.com:querydsl/maven-apt-plugin.git</connection>
+    <url>git@github.com:querydsl/maven-apt-plugin.git</url>
   </scm>  
   
   <properties>
