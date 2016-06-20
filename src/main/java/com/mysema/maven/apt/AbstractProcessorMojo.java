@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -110,6 +111,16 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
      */
     private List<Artifact> pluginArtifacts;
+
+    /**
+     * @parameter required=false
+     */
+    private String[] additionalSourceFolders;
+
+    /**
+     * @parameter required=false
+     */
+    private String[] additionalTestSourceFolders;
 
     /**
      * @parameter
@@ -422,15 +433,39 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         File outputDirectory = getOutputDirectory();
         String outputPath = outputDirectory.getAbsolutePath();
         Set<File> directories = new HashSet<File>();        
-        List<String> directoryNames = isForTest() ? project.getTestCompileSourceRoots() 
-                                                  : project.getCompileSourceRoots();
+        List<String> directoryNames = isForTest() ? getTestCompileSourceRoots()
+                                                  : getCompileSourceRoots();
         for (String name : directoryNames) {
             File file = new File(name);
-            if (!file.getAbsolutePath().equals(outputPath) && file.exists()) {
+            if (!file.getAbsolutePath().equals(outputPath) && file.exists() && file.isDirectory()) {
                 directories.add(file);    
             }            
         }
         return directories;
+    }
+
+    private List getTestCompileSourceRoots() {
+        final List sourceRoots = new ArrayList(project.getTestCompileSourceRoots());
+        if (additionalTestSourceFolders != null) {
+            final List<String> testSourceFolders = Arrays.asList(additionalTestSourceFolders);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("add additional test-sources: " + Joiner.on(", ").skipNulls().join(testSourceFolders));
+            }
+            sourceRoots.addAll(testSourceFolders);
+        }
+        return sourceRoots;
+    }
+
+    private List getCompileSourceRoots() {
+        final List sourceRoots = new ArrayList(project.getCompileSourceRoots());
+        if (additionalSourceFolders != null) {
+            final List<String> sourceFolders = Arrays.asList(this.additionalSourceFolders);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug("add additional sources: " + Joiner.on(", ").skipNulls().join(sourceFolders));
+            }
+            sourceRoots.addAll(sourceFolders);
+        }
+        return sourceRoots;
     }
 
     protected boolean isForTest() {
