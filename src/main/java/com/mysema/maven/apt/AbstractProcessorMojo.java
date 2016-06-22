@@ -113,14 +113,18 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
     private List<Artifact> pluginArtifacts;
 
     /**
+     * A list of additional source roots for the apt processor
+     *
      * @parameter required=false
      */
-    private String[] additionalSourceFolders;
+    private List<String> additionalSourceRoots;
 
     /**
+     * A list of additional test source roots for the apt processor
+     *
      * @parameter required=false
      */
-    private String[] additionalTestSourceFolders;
+    private List<String> additionalTestSourceRoots;
 
     /**
      * @parameter
@@ -444,27 +448,30 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         return directories;
     }
 
-    private List getTestCompileSourceRoots() {
-        final List sourceRoots = new ArrayList(project.getTestCompileSourceRoots());
-        if (additionalTestSourceFolders != null) {
-            final List<String> testSourceFolders = Arrays.asList(additionalTestSourceFolders);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("add additional test-sources: " + Joiner.on(", ").skipNulls().join(testSourceFolders));
-            }
-            sourceRoots.addAll(testSourceFolders);
+    @SuppressWarnings("unchecked")
+    private List<String> getTestCompileSourceRoots() {
+        if (additionalTestSourceRoots == null) {
+            return project.getTestCompileSourceRoots();
         }
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("add additional test source roots: " + Joiner.on(", ").skipNulls().join(additionalTestSourceRoots));
+        }
+        final List<String> sourceRoots = new ArrayList<String>(project.getTestCompileSourceRoots());
+        sourceRoots.addAll(additionalTestSourceRoots);
         return sourceRoots;
     }
 
-    private List getCompileSourceRoots() {
-        final List sourceRoots = new ArrayList(project.getCompileSourceRoots());
-        if (additionalSourceFolders != null) {
-            final List<String> sourceFolders = Arrays.asList(this.additionalSourceFolders);
-            if (getLog().isDebugEnabled()) {
-                getLog().debug("add additional sources: " + Joiner.on(", ").skipNulls().join(sourceFolders));
-            }
-            sourceRoots.addAll(sourceFolders);
+    @SuppressWarnings("unchecked")
+    private List<String> getCompileSourceRoots() {
+        if (additionalSourceRoots == null) {
+            return project.getCompileSourceRoots();
         }
+
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("add additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
+        }
+        final List<String> sourceRoots = new ArrayList<String>(project.getCompileSourceRoots());
+        sourceRoots.addAll(additionalSourceRoots);
         return sourceRoots;
     }
 
