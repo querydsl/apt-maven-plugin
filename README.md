@@ -11,6 +11,7 @@ The supported goals are
 
 Here is an example of a configuration
 
+```xml
     <plugin>
         <groupId>com.mysema.maven</groupId>
         <artifactId>apt-maven-plugin</artifactId>
@@ -27,6 +28,7 @@ Here is an example of a configuration
             </execution>
         </executions>
     </plugin>
+```
 
 Here is an example for usage with the m2e plugin https://github.com/querydsl/apt-maven-plugin/wiki/m2e-usage
 
