@@ -3,6 +3,7 @@
 apt-maven-plugin provides Maven integration of the Java 6 APT functionality.
 
 [![Build Status](https://travis-ci.org/querydsl/apt-maven-plugin.svg?branch=master)](https://travis-ci.org/querydsl/apt-maven-plugin)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.mysema.maven/apt-maven-plugin/badge.svg)](https://maven-badges.herokuapp.com/com.mysema.maven/apt-maven-plugin/spring-data-mock)
 
 The supported goals are
 
