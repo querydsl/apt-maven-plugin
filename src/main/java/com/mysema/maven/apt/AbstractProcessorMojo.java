@@ -454,9 +454,9 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
             return project.getTestCompileSourceRoots();
         }
         if (getLog().isDebugEnabled()) {
-            getLog().debug("add additional test source roots: " + Joiner.on(", ").skipNulls().join(additionalTestSourceRoots));
+            getLog().debug("Adding additional test source roots: " + Joiner.on(", ").skipNulls().join(additionalTestSourceRoots));
         }
-        final List<String> sourceRoots = new ArrayList<String>(project.getTestCompileSourceRoots());
+        List<String> sourceRoots = new ArrayList<String>(project.getTestCompileSourceRoots());
         sourceRoots.addAll(additionalTestSourceRoots);
         return sourceRoots;
     }
@@ -468,9 +468,9 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         }
 
         if (getLog().isDebugEnabled()) {
-            getLog().debug("add additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
+            getLog().debug("Adding additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
         }
-        final List<String> sourceRoots = new ArrayList<String>(project.getCompileSourceRoots());
+        List<String> sourceRoots = new ArrayList<String>(project.getCompileSourceRoots());
         sourceRoots.addAll(additionalSourceRoots);
         return sourceRoots;
     }
