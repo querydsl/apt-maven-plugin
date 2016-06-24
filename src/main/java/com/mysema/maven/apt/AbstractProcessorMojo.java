@@ -466,7 +466,6 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         if (additionalSourceRoots == null) {
             return project.getCompileSourceRoots();
         }
-
         if (getLog().isDebugEnabled()) {
             getLog().debug("Adding additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
         }
