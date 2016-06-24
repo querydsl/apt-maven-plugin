@@ -12,22 +12,22 @@ The supported goals are
 Here is an example of a configuration
 
 ```xml
-    <plugin>
-        <groupId>com.mysema.maven</groupId>
-        <artifactId>apt-maven-plugin</artifactId>
-        <version>1.1.3</version>
-        <executions>
-            <execution>
-                <goals>
-                    <goal>process</goal>
-                </goals>
-                <configuration>
-                    <outputDirectory>target/generated-sources/java</outputDirectory>
-                    <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
-                </configuration>
-            </execution>
-        </executions>
-    </plugin>
+<plugin>
+    <groupId>com.mysema.maven</groupId>
+    <artifactId>apt-maven-plugin</artifactId>
+    <version>1.1.3</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>process</goal>
+            </goals>
+            <configuration>
+                <outputDirectory>target/generated-sources/java</outputDirectory>
+                <processor>com.mysema.query.apt.jpa.JPAAnnotationProcessor</processor>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
 ```
 
 Here is an example for usage with the m2e plugin https://github.com/querydsl/apt-maven-plugin/wiki/m2e-usage
