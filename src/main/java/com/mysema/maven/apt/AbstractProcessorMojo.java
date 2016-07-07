@@ -22,6 +22,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.google.common.base.Joiner;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.DependencyResolutionRequiredException;
@@ -110,6 +111,20 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
      * @parameter expression="${plugin.artifacts}" readonly=true required=true
      */
     private List<Artifact> pluginArtifacts;
+
+    /**
+     * A list of additional source roots for the apt processor
+     *
+     * @parameter required=false
+     */
+    private List<String> additionalSourceRoots;
+
+    /**
+     * A list of additional test source roots for the apt processor
+     *
+     * @parameter required=false
+     */
+    private List<String> additionalTestSourceRoots;
 
     /**
      * @parameter
@@ -422,15 +437,44 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         File outputDirectory = getOutputDirectory();
         String outputPath = outputDirectory.getAbsolutePath();
         Set<File> directories = new HashSet<File>();        
-        List<String> directoryNames = isForTest() ? project.getTestCompileSourceRoots() 
-                                                  : project.getCompileSourceRoots();
+        List<String> directoryNames = isForTest() ? getTestCompileSourceRoots()
+                                                  : getCompileSourceRoots();
         for (String name : directoryNames) {
             File file = new File(name);
-            if (!file.getAbsolutePath().equals(outputPath) && file.exists()) {
+            if (!file.getAbsolutePath().equals(outputPath) && file.exists() && file.isDirectory()) {
                 directories.add(file);    
             }            
         }
         return directories;
+    }
+
+
+    private List<String> getTestCompileSourceRoots() {
+        @SuppressWarnings("unchecked")
+        final List<String> testCompileSourceRoots = project.getTestCompileSourceRoots();
+        if (additionalTestSourceRoots == null) {
+            return testCompileSourceRoots;
+        }
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Adding additional test source roots: " + Joiner.on(", ").skipNulls().join(additionalTestSourceRoots));
+        }
+        List<String> sourceRoots = new ArrayList<String>(testCompileSourceRoots);
+        sourceRoots.addAll(additionalTestSourceRoots);
+        return sourceRoots;
+    }
+
+    private List<String> getCompileSourceRoots() {
+        @SuppressWarnings("unchecked")
+        final List<String> compileSourceRoots = project.getCompileSourceRoots();
+        if (additionalSourceRoots == null) {
+            return compileSourceRoots;
+        }
+        if (getLog().isDebugEnabled()) {
+            getLog().debug("Adding additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
+        }
+        List<String> sourceRoots = new ArrayList<String>(compileSourceRoots);
+        sourceRoots.addAll(additionalSourceRoots);
+        return sourceRoots;
     }
 
     protected boolean isForTest() {
