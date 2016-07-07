@@ -448,28 +448,31 @@ public abstract class AbstractProcessorMojo extends AbstractMojo {
         return directories;
     }
 
-    @SuppressWarnings("unchecked")
+
     private List<String> getTestCompileSourceRoots() {
+        @SuppressWarnings("unchecked")
+        final List<String> testCompileSourceRoots = project.getTestCompileSourceRoots();
         if (additionalTestSourceRoots == null) {
-            return project.getTestCompileSourceRoots();
+            return testCompileSourceRoots;
         }
         if (getLog().isDebugEnabled()) {
             getLog().debug("Adding additional test source roots: " + Joiner.on(", ").skipNulls().join(additionalTestSourceRoots));
         }
-        List<String> sourceRoots = new ArrayList<String>(project.getTestCompileSourceRoots());
+        List<String> sourceRoots = new ArrayList<String>(testCompileSourceRoots);
         sourceRoots.addAll(additionalTestSourceRoots);
         return sourceRoots;
     }
 
-    @SuppressWarnings("unchecked")
     private List<String> getCompileSourceRoots() {
+        @SuppressWarnings("unchecked")
+        final List<String> compileSourceRoots = project.getCompileSourceRoots();
         if (additionalSourceRoots == null) {
-            return project.getCompileSourceRoots();
+            return compileSourceRoots;
         }
         if (getLog().isDebugEnabled()) {
             getLog().debug("Adding additional source roots: " + Joiner.on(", ").skipNulls().join(additionalSourceRoots));
         }
-        List<String> sourceRoots = new ArrayList<String>(project.getCompileSourceRoots());
+        List<String> sourceRoots = new ArrayList<String>(compileSourceRoots);
         sourceRoots.addAll(additionalSourceRoots);
         return sourceRoots;
     }
